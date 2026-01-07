@@ -1,0 +1,70 @@
+import { SavedFactory } from "@/types";
+import { IconWithTooltip } from "@/reusableComp/IconWithTooltip";
+import { useDraggable } from "@/reusableComp/useDraggable";
+import { twMerge } from "tailwind-merge";
+import { DetailedView } from "./DetailedView";
+import { Button } from "@/components/ui/button";
+import { useDirtyState } from "@/DirtyStateContext";
+
+export const Factory = (props: {
+  factory: SavedFactory;
+  selected: boolean;
+  isHovered: boolean;
+  hoveredAccumulatedProduct: string | null;
+  setLoadedFactory: (factory: SavedFactory) => void;
+  setHoveredFactoryId: (id: string | null) => void;
+  onDrop: (
+    sourceId: string,
+    targetId: string,
+    closestEdge: "left" | "right"
+  ) => void;
+}) => {
+  const { isDirty } = useDirtyState();
+  const ref = useDraggable(props.factory.id, props.onDrop, isDirty);
+
+  const productNodes = props.factory.productNodes;
+  const root = productNodes.find((node) => node.type === "ROOT")!;
+  const leaves = productNodes.filter(
+    (n) => n.children.length === 0 && !n.subRootPointer
+  );
+  const hoveredIsOutput = root.name === props.hoveredAccumulatedProduct;
+  const hoveredIsInput = leaves.some(
+    (x) => x.name === props.hoveredAccumulatedProduct
+  );
+  return (
+    <>
+      <div
+        ref={ref}
+        className={twMerge(
+          "border-black border-2",
+          hoveredIsOutput
+            ? "border-dashed"
+            : hoveredIsInput
+            ? "border-dotted"
+            : "border-solid",
+          props.selected || hoveredIsOutput || hoveredIsInput
+            ? ""
+            : "border-white"
+        )}
+      >
+        <Button
+          variant="outline"
+          size="lg"
+          onMouseEnter={() => props.setHoveredFactoryId(props.factory.id)}
+          onMouseLeave={() => props.setHoveredFactoryId(null)}
+          onClick={() => props.setLoadedFactory(props.factory)}
+        >
+          <div className="flex items-center">
+            {Math.round(root?.rate * 100) / 100}/s
+            <IconWithTooltip item={root.name} />
+          </div>
+        </Button>
+      </div>
+      {props.isHovered && (
+        <div className="fixed bottom-4 right-4 z-100 bg-gray-200 rounded border-2">
+          <DetailedView savedSetting={props.factory} />
+        </div>
+      )}
+    </>
+  );
+};
