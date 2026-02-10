@@ -1,9 +1,16 @@
-import { ProductNode, SavedFactory } from "./types";
+import { v4 as uuidv4 } from "uuid";
+import { SavedFactory } from "./types";
 import { ProductionTree } from "./components/productionTree/ProductionTree";
 import { Button } from "@/components/ui/button";
-import { Copy, Save, Trash, X } from "lucide-react";
+import { ChevronDown, Copy, Save, Trash, X } from "lucide-react";
 import { Icon } from "./reusableComp/Icon";
 import { useDirtyState } from "./DirtyStateContext";
+import { TreeSettingsProvider } from "./context/TreeSettingsContext";
+import { ProductCombobox } from "./reusableComp/ProductCombobox";
+import allRecipes from "./gameData/recipes.json";
+import { formatName } from "./lib/utils";
+
+const allProducts = [...new Set(allRecipes.map((x) => x.product))];
 
 export const Drawer = (props: {
   loadedFactory: SavedFactory;
@@ -16,24 +23,40 @@ export const Drawer = (props: {
 
   const notReadyForSaving = !root || !root.name || !root.rate;
 
-  const setNewProduct = (node: ProductNode) => {
+  const setProductToProduce = (product: string) => {
+    const rateOneMachine = 1;
     props.setLoadedFactory({
       id: props.loadedFactory.id,
-      productNodes: [node],
+      productNodes: [{
+        id: uuidv4(),
+        name: product,
+        rate: rateOneMachine,
+        type: "ROOT",
+        children: [],
+      }],
     });
   };
 
   return (
     <div className="flex flex-col h-full">
       <div className="flex justify-between items-center px-2 py-1 border-2 bg-gray-200 text-xl font-semibold">
-        {root?.name ? (
-          <div className="flex gap-2 items-center">
-            <Icon item={root.name} />
-            {root.name}
-          </div>
-        ) : (
-          <div>New factory!</div>
-        )}
+        <ProductCombobox
+          product={root?.name ?? ""}
+          setProduct={setProductToProduce}
+          allProducts={allProducts}
+        >
+          <button className="flex gap-2 items-center hover:text-primary cursor-pointer">
+            {root?.name ? (
+              <>
+                <Icon item={root.name} />
+                {formatName(root.name)}
+              </>
+            ) : (
+              "Select product to produce!"
+            )}
+            <ChevronDown size={16} className="text-gray-500" />
+          </button>
+        </ProductCombobox>
         <div>
           <Button
             variant="outline"
@@ -64,17 +87,18 @@ export const Drawer = (props: {
           </Button>
         </div>
       </div>
-      <ProductionTree
-        savedFactory={props.loadedFactory}
-        setProductNodes={(updater) => {
-          const newNodes = updater(props.loadedFactory.productNodes);
-          props.setLoadedFactory({
-            id: props.loadedFactory.id,
-            productNodes: newNodes,
-          });
-        }}
-        setNewProduct={setNewProduct}
-      />
+      <TreeSettingsProvider>
+        <ProductionTree
+          savedFactory={props.loadedFactory}
+          setProductNodes={(updater) => {
+            const newNodes = updater(props.loadedFactory.productNodes);
+            props.setLoadedFactory({
+              id: props.loadedFactory.id,
+              productNodes: newNodes,
+            });
+          }}
+        />
+      </TreeSettingsProvider>
     </div>
   );
 };

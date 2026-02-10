@@ -1955,10 +1955,10 @@
   {
     "name": "uranium-processing",
     "product": "uranium-235",
-    "amount": 1,
+    "amount": 0.007000000000000001,
     "ingredients": [
       { "name": "uranium-ore", "amount": 10 },
-      { "name": "uranium-238", "amount": -1 }
+      { "name": "uranium-238", "amount": -0.993 }
     ],
     "energy_required": 12,
     "category": "centrifuging"
@@ -1966,10 +1966,10 @@
   {
     "name": "uranium-processing",
     "product": "uranium-238",
-    "amount": 1,
+    "amount": 0.993,
     "ingredients": [
       { "name": "uranium-ore", "amount": 10 },
-      { "name": "uranium-235", "amount": -1 }
+      { "name": "uranium-235", "amount": -0.007000000000000001 }
     ],
     "energy_required": 12,
     "category": "centrifuging"

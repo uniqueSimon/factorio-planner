@@ -5,7 +5,6 @@ import { LocalStorage } from "./components/localStorage/LocalStorage";
 import { NaviagationBar } from "./NavigationBar";
 import { Home } from "./Home";
 import { DirtyStateProvider } from "./DirtyStateContext";
-import { TreeSettingsProvider } from "./context/TreeSettingsContext";
 
 export const App = () => {
   const [savedFactories, setSavedFactories] = useLocalStorage<Cluster[]>(
@@ -21,12 +20,10 @@ export const App = () => {
             <Route
               path="/factorio-planner/"
               element={
-                <TreeSettingsProvider>
-                  <Home
-                    savedFactories={savedFactories}
-                    setSavedFactories={setSavedFactories}
-                  />
-                </TreeSettingsProvider>
+                <Home
+                  savedFactories={savedFactories}
+                  setSavedFactories={setSavedFactories}
+                />
               }
             />
             <Route

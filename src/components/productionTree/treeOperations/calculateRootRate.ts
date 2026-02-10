@@ -1,5 +1,6 @@
 import { ProductNode } from "@/types";
 import allRecipes from "../../../gameData/recipes.json";
+import { productivityModuleBonus } from "@/gameData/misc";
 
 /** Calculates the rate of the root product if the rate of some ingredient changes. */
 export const calculateRootRate = (
@@ -17,7 +18,13 @@ export const calculateRootRate = (
     const ingredient = recipe.ingredients.find(
       (x) => x.name === currentNode.name
     )!;
-    const parentRate = (recipe.amount / ingredient.amount) * newRate;
+    
+    // Calculate productivity bonus for the parent node
+    const productivityModules = parent.productivityModules ?? 0;
+    const productivityBonus = 1 + (productivityModules * productivityModuleBonus);
+    
+    // With productivity, the parent produces more output from the same input
+    const parentRate = (recipe.amount * productivityBonus / ingredient.amount) * newRate;
     return calculateRootRate(nodes, parent.id, parentRate);
   }
   const leavesWithPointer = nodes.filter(

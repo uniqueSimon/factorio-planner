@@ -10,7 +10,6 @@ import {
 } from "./components/ConfirmationDialogs";
 import { useDraggingDrawer } from "./reusableComp/useDraggingDrawer";
 import { useDirtyState } from "./DirtyStateContext";
-import { TierSetting } from "./TierSetting";
 
 export const Home = (props: {
   savedFactories: Cluster[];
@@ -115,7 +114,6 @@ export const Home = (props: {
   return (
     <div className="flex h-screen overflow-hidden">
       <div className="flex-1 overflow-auto transition-all duration-300 flex flex-col">
-        <TierSetting />
         <FactoryPlanner
           loadedFactory={loadedFactory}
           setLoadedFactory={handleSwitchLoadedFactory}

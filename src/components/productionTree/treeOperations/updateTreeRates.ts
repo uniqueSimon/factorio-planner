@@ -1,5 +1,6 @@
 import { ProductNode } from "@/types";
 import allRecipes from "../../../gameData/recipes.json";
+import { productivityModuleBonus } from "@/gameData/misc";
 
 export const updateTreeRates = (
   nodes: ProductNode[],
@@ -43,14 +44,20 @@ export const updateTreeRates = (
       (r) => r.product === node.name && r.name === node.recipeName
     )!;
 
+    // Calculate productivity bonus for this node
+    const productivityModules = node.productivityModules ?? 0;
+    const productivityBonus = 1 + (productivityModules * productivityModuleBonus);
+
     for (const childId of node.children) {
       const childNode = nodes.find((n) => n.id === childId)!;
 
+      //x.amount * childNode.rate > 0 for dintinguishing ingredient and byproduct
       const ingredient = recipe.ingredients.find(
-        (x) => x.name === childNode.name
+        (x) => x.name === childNode.name && x.amount * childNode.rate > 0
       )!;
 
-      const ingredientRate = (ingredient.amount / recipe.amount) * rate;
+      // With productivity, we need less input to achieve the same output rate
+      const ingredientRate = (ingredient.amount / (recipe.amount * productivityBonus)) * rate;
       updateNodeRate(ingredientRate, childNode);
     }
   };

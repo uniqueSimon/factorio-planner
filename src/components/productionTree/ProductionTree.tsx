@@ -1,7 +1,5 @@
-import { v4 as uuidv4 } from "uuid";
 import { useState } from "react";
 import { ProductNode, SavedFactory } from "../../types";
-import { ProductionSetupForm } from "./ProductionSetupForm";
 import { RecursiveTree } from "./RecursiveTree";
 import { buildTree } from "./treeOperations/buildTree";
 import { selectRecipe } from "./treeOperations/selectRecipe";
@@ -12,11 +10,11 @@ import { calculateRootRate } from "./treeOperations/calculateRootRate";
 import { TreeSettings } from "./TreeSettings";
 import { reattachSubTree } from "./treeOperations/reattachSubTree";
 import { removeDisconnectedBranches } from "./treeOperations/removeDisconnectedBranches";
+import { updateNodeSettings } from "./treeOperations/updateNodeSettings";
 
 export const ProductionTree = (props: {
   savedFactory: SavedFactory;
   setProductNodes: (updater: (prev: ProductNode[]) => ProductNode[]) => void;
-  setNewProduct: (node: ProductNode) => void;
 }) => {
   const nodes = props.savedFactory.productNodes;
   const [containerElement, setContainerElement] = useState<HTMLElement | null>(
@@ -30,22 +28,6 @@ export const ProductionTree = (props: {
 
   const root = nodes.find((node) => node.type === "ROOT");
   const forest = nodes.length > 0 && root?.name ? buildTree(nodes) : null;
-
-  const setProductToProduce = (product: string) => {
-    const rateOneMachine = 1;
-    props.setNewProduct({
-      id: uuidv4(),
-      name: product,
-      rate: rateOneMachine,
-      type: "ROOT",
-      children: [],
-    });
-  };
-
-  const onSetOutputRate = (rate: number) =>
-    props.setProductNodes((currentNodes) =>
-      updateTreeRates(currentNodes, rate)
-    );
 
   const onSelectRecipe = (id: string, recipe: string) =>
     props.setProductNodes((currentNodes) =>
@@ -84,16 +66,14 @@ export const ProductionTree = (props: {
       return updateTreeRates(remainingNodes);
     });
 
+  const onUpdateSettings = (id: string, machineTier: string, productivityModules: number) =>
+    props.setProductNodes((currentNodes) =>
+      updateNodeSettings(currentNodes, id, machineTier, productivityModules)
+    );
+
   return (
     <div className="flex-1 overflow-y-auto overflow-x-hidden">
       <div className="w-full bg-gray-50">
-        <ProductionSetupForm
-          product={root?.name ?? ""}
-          rate={root?.rate ?? 0}
-          rootRecipe={root?.recipeName}
-          setProduct={setProductToProduce}
-          setRate={onSetOutputRate}
-        />
         <TreeSettings />
         {forest && (
           <div ref={containerRef} className="relative flex flex-wrap">
@@ -104,6 +84,7 @@ export const ProductionTree = (props: {
                 onSelectRecipe={onSelectRecipe}
                 onSelectNew={onSelectNew}
                 onUpdateRate={onUpdateRate}
+                onUpdateSettings={onUpdateSettings}
                 container={containerElement}
                 onMoveToSubtree={onMoveToSubtree}
                 onReattachSubtree={onReattachSubtree}
@@ -117,6 +98,7 @@ export const ProductionTree = (props: {
                   onSelectRecipe={onSelectRecipe}
                   onSelectNew={onSelectNew}
                   onUpdateRate={onUpdateRate}
+                  onUpdateSettings={onUpdateSettings}
                   container={containerElement}
                   onMoveToSubtree={onMoveToSubtree}
                   onReattachSubtree={onReattachSubtree}

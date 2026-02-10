@@ -22,6 +22,8 @@ interface ProductNodeCommon {
   type: NodeType;
   recipeName?: string;
   subRootPointer?: string;
+  machineTier?: string; // e.g., "assembling-machine-3", "stone-furnace"
+  productivityModules?: number; // 0-4 productivity modules
 }
 export interface ProductNode extends ProductNodeCommon {
   children: string[];
@@ -59,3 +61,5 @@ export interface TreeResults {
   recipe?: Recipe;
   type?: "RESOURCE" | "MULTIPLE";
 }
+
+export type MachineTier = string; // e.g., "assembling-machine-1", "stone-furnace"

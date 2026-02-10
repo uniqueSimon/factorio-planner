@@ -11,6 +11,7 @@ export const RecursiveTree = (props: {
   onSelectNew: (id: string, recipe: string) => void;
   onClearRecipe: (id: string) => void;
   onUpdateRate: (nodeId: string, newRate: number) => void;
+  onUpdateSettings: (id: string, machineTier: string, productivityModules: number) => void;
   container: HTMLElement | null;
   onMoveToSubtree: (id: string) => void;
   onReattachSubtree: (id: string) => void;

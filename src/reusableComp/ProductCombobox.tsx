@@ -14,28 +14,33 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils"; // for conditional classNames
+import { cn, formatName } from "@/lib/utils";
 import { Icon } from "@/reusableComp/Icon";
 
 export function ProductCombobox(props: {
   product: string;
   setProduct: (p: string) => void;
   allProducts: string[];
+  children?: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-48 justify-between"
-        >
-          {props.product ? props.product : "Select product"}
-          <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
-        </Button>
+        {props.children ? (
+          props.children
+        ) : (
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-48 justify-between"
+          >
+            {props.product ? formatName(props.product) : "Select product"}
+            <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
+          </Button>
+        )}
       </PopoverTrigger>
 
       <PopoverContent className="w-48 p-0">
@@ -54,7 +59,7 @@ export function ProductCombobox(props: {
                 >
                   <div className="flex items-center gap-2">
                     <Icon item={p} className="h-5 w-5 overflow-hidden" />
-                    {p}
+                    {formatName(p)}
                     <Check
                       className={cn(
                         "ml-auto h-4 w-4",
